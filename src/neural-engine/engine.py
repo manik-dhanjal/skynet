@@ -87,9 +87,8 @@ class Value:
                     stack+= cur._children
 
 
-
 def draw_graph(parent: Value):
-    f = graphviz.Digraph(node_attr={'shape': 'record', 'height': '.1'})
+    f = graphviz.Digraph(node_attr={'shape': 'record'}, format='svg', graph_attr={'rankdir': 'LR'})
     stack = [parent];
     f.node(str(id(parent)),nohtml(f'<f0> {parent.label} |<f1> Data: {parent.data}|<f2>Grad: {parent.grad}'))
     while len(stack)!=0:
