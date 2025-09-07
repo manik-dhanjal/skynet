@@ -1,4 +1,4 @@
-from engine import Value
+from .engine import Value
 import random
 
 class Neuron:
@@ -46,3 +46,9 @@ class MLP:
 
     def parameters(self):
         return [p for layer in self.layers for p in layer.parameters()]
+
+
+def mse_loss(exp_out:list[float], res_out: list[Value])-> Value:
+    loss = sum( (eo-ro)**2 for eo, ro in zip(exp_out, res_out))
+    return loss
+
