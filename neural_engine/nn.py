@@ -3,14 +3,19 @@ import random
 
 class Neuron:
     #nin: number of inputs a neuron should expect
-    def __init__(self, nin:int=1):
+    def __init__(self, nin:int=1, act_type='tanh'):
         self.weights = [Value(data=random.uniform(-1,1), label='weight') for _ in range(nin)]
         self.bias = Value(data=random.uniform(-1,1), label='bias')
+        self.act_type = act_type
 
     def __call__(self, vals):
         act = sum((weight*val for weight, val in zip(self.weights, vals)), self.bias)
-        out = act.tan()
-        return out
+        if self.act_type == 'tanh':
+           return act.tan()
+        elif self.act_type == 'sigmoid':
+            return act.sig()
+        else:
+            return act.relu()
 
     def parameters(self):
         return self.weights + [self.bias]
@@ -18,8 +23,15 @@ class Neuron:
 class Layer:
     # nin: number of inputs a layer should handle
     # nout: number of outputs given by layer or number of neurons
-    def __init__(self, nin: int, nout: int):
-        self.neurons = [Neuron(nin) for _ in range(nout)]
+    def __init__(self, nin: int, nout: int, act_type:str="tanh", name=''):
+        self.name=act_type+'-'+name
+        self.act_type=act_type
+        if act_type == 'tanh':
+            self.neurons = [Neuron(nin) for _ in range(nout)]
+        elif act_type == 'sigmoid':
+            self.neurons = [Neuron(nin) for _ in range(nout)]
+        else:
+            self.neurons = [Neuron(nin) for _ in range(nout)]
 
     def __call__(self, x: list[float]) -> list[Value]:
         outs = [neuron(x) for neuron in self.neurons]
@@ -33,11 +45,8 @@ class Layer:
 
 
 class MLP:
-    # nin: number of inputs expected for MLP
-    # nouts: list of counts of neurons each layer going to have
-    def __init__(self, nin: int, nouts: list[int]):
-        sn = [nin] + nouts
-        self.layers = [Layer(sn[i], sn[i + 1]) for i in range(len(nouts))]
+    def __init__(self, layers: list[Layer]):
+        self.layers = layers
 
     def __call__(self, x: list[float]) -> list[Value]:
         for layer in self.layers:

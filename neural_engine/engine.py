@@ -39,6 +39,15 @@ class Value:
         out._backward = _backward
         return out
 
+    def sig(self):
+        x = self.data
+        s = 1 / (1 + math.exp(-x))
+        out = Value(data = s, _children=(self,), _op='sigmoid')
+        def _backward():
+            return s*(1-s) * out.grad
+        out._backward = _backward
+        return out
+
     def relu(self):
         out = Value(0 if self.data < 0 else self.data, (self,), 'ReLU')
 
